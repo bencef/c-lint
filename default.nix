@@ -11,12 +11,16 @@ stdenv.mkDerivation {
   buildInputs = [ haskell makeWrapper clang ];
   phases = [ "unpackPhase" "installPhase" ];
 
+  CC_VERSION = stdenv.cc.cc.version;
+
   installPhase = ''
     mkdir -p $out/{bin,libexec}
     install -m 555 c++lint "$out/libexec"
+    CC_INCLUDE="${stdenv.cc.cc}/include/c++/$CC_VERSION"
+    # FIX_ME how to get 'x86_64-unknown-linux-gnu' in a portable way?
     makeWrapper "$out/libexec/c++lint" "$out/bin/c++lint" \
-      --set CPPLINT_INCLUDE_DIRS "${stdenv.cc.cc}/include/c++/*/" \
-      --suffix CPPLINT_INCLUDE_DIRS : "${stdenv.cc.cc}/include/c++/*/*-linux-*/" \
+      --suffix CPPLINT_INCLUDE_DIRS : "$CC_INCLUDE/" \
+      --suffix CPPLINT_INCLUDE_DIRS : "$CC_INCLUDE/x86_64-unknown-linux-gnu/" \
       --suffix CPPLINT_INCLUDE_DIRS : "${stdenv.cc.libc_dev}/include/"
   '';
 }

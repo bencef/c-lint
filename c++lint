@@ -1,3 +1,0 @@
-#!/bin/sh
-
-echo $CPPLINT_INCLUDE_DIRS

@@ -9,9 +9,13 @@ stdenv.mkDerivation {
   src     = ./.;
 
   buildInputs = [ haskell makeWrapper clang ];
-  phases = [ "unpackPhase" "installPhase" ];
+  phases = [ "unpackPhase" "buildPhase" "installPhase" ];
 
   CC_VERSION = stdenv.cc.cc.version;
+
+  buildPhase = ''
+    ghc -O2 -threaded c++lint.hs -o c++lint
+  '';
 
   installPhase = ''
     mkdir -p $out/{bin,libexec}

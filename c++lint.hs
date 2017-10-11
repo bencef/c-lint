@@ -9,9 +9,9 @@ type Define = (Text, Text)
 
 data Settings = Settings
   { file     :: FilePath
-  , checks   :: [Text]
-  , includes :: [Text]
-  , defines  :: [Define]
+  , checks   :: Maybe [Text]
+  , includes :: Maybe [Text]
+  , defines  :: Maybe [Define]
   }
 
 getPaths :: String -> IO [Text]
@@ -36,9 +36,9 @@ parseSettings = options "C++ static linter" settingParser
   where
     settingParser :: Parser Settings
     settingParser = Settings <$> parseFile
-                             <*> parseChecks
-                             <*> parseIncludes
-                             <*> parseDefines
+                             <*> optional parseChecks
+                             <*> optional parseIncludes
+                             <*> optional parseDefines
 
 main = do
   (Settings file checks includes defines) <- parseSettings

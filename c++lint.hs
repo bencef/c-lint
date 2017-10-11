@@ -2,7 +2,7 @@
 
 import Turtle
 import System.Environment (lookupEnv)
-import Data.Text (pack, split)
+import qualified Data.Text as T (pack, split, append)
 import Prelude hiding (FilePath)
 
 type Define = (Text, Text)
@@ -17,7 +17,7 @@ data Settings = Settings
 getPaths :: String -> IO [Text]
 getPaths s = do
   e <- lookupEnv s
-  return (maybe [] (\t -> split (':'==) (pack t)) e)
+  return (maybe [] (\t -> T.split (':'==) (T.pack t)) e)
 
 parseFile :: Parser FilePath
 parseFile = argPath "file" empty
@@ -40,7 +40,12 @@ parseSettings = options "C++ static linter" settingParser
                              <*> optional parseIncludes
                              <*> optional parseDefines
 
+toIncludes :: [Text] -> [Text]
+toIncludes = fmap includize
+  where
+    includize p = "-I" `T.append` p
+
 main = do
   (Settings file checks includes defines) <- parseSettings
   dirs <- getPaths "CPPLINT_INCLUDE_DIRS"
-  print file
+  proc "clang-tidy" ([(format fp file), "--", "--std=c++11"] ++ toIncludes dirs) empty

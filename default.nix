@@ -1,4 +1,5 @@
-{stdenv, haskellPackages, makeWrapper, clang}:
+{stdenv, haskellPackages, makeWrapper, clang
+,source ? ./.}:
 
 let
   haskell = haskellPackages.ghcWithPackages (pkgs: with pkgs; [ turtle ]);
@@ -6,7 +7,7 @@ in
 stdenv.mkDerivation {
   name    = "c++lint";
   version = "0.1.0";
-  src     = ./.;
+  src     = source;
 
   buildInputs = [ haskell makeWrapper clang ];
   phases = [ "unpackPhase" "buildPhase" "installPhase" ];
